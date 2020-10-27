@@ -70,36 +70,81 @@ function formMagicSquare(matrix){
     const diagonals = new Map();
     const repeated = new Map();
     const range = matrix.length;
-    diagonals.set('diagonal',0)
-    diagonals.set('antidiagonal',0)
-    for(let rangeIndex = 0;rangeIndex < range; rangeIndex++){
-        rows.set(rangeIndex, 0)
-        columns.set(rangeIndex, 0)
+    if(range != 3){
+        throw new Error('Invalid matrix range: ', range);
     }
-    matrix.map( (row, rowIndex) => {
-        row.map( (value, columnIndex) => {
-            if(map.get(value) === undefined){
-                map.set(value, [[rowIndex, columnIndex]])
-            }else{
-                map.set(value, map.get(value).push([rowIndex, columnIndex]))
-                repeated.set([rowIndex, columnIndex], value)
-            }
-            map.set([rowIndex, columnIndex], value)
-            rows.set(rowIndex, rows.get(rowIndex) + value)
-            columns.set(columnIndex, columns.get(columnIndex) + value)
-            if(rowIndex == columnIndex){
-                diagonals.set('diagonal',
-                ((diagonals.get('diagonal') === undefined)? 0 : diagonals.get('diagonal')) + value)
-            }
-            if(rowIndex + 1 + columnIndex == range){
-                diagonals.set('antidiagonal',
-                ((diagonals.get('antidiagonal') === undefined)? 0 : diagonals.get('antidiagonal')) + value)
-            }
-        })
-    })
+    const magicConstant = (((range**2)+1)/2)*range
+    const center = 5//getCenter(range, magicConstant)
+    const minNumber = 1;
+    const maxNumber = range**2;
+    const interval = [minNumber, maxNumber]
+    //diagonals.set('diagonal',0)
+    //diagonals.set('antidiagonal',0)
+    //for(let rangeIndex = 0;rangeIndex < range; rangeIndex++){
+    //    rows.set(rangeIndex, 0)
+    //    columns.set(rangeIndex, 0)
+    //}
+    //matrix.map( (row, rowIndex) => {
+    //    row.map( (value, columnIndex) => {
+    //        if(value < minNumber || value > maxNumber){
+    //            throw new Error('Invalid matrix value: ', value);
+    //        }
+    //        if(map.get(value) === undefined){
+    //            map.set(value, [[rowIndex, columnIndex]])
+    //        }else{
+    //            map.set(value, map.get(value).push([rowIndex, columnIndex]))
+    //            repeated.set([rowIndex, columnIndex], value)
+    //        }
+    //        map.set([rowIndex, columnIndex], value)
+    //        rows.set(rowIndex, rows.get(rowIndex) + value)
+    //        columns.set(columnIndex, columns.get(columnIndex) + value)
+    //        if(rowIndex == columnIndex){
+    //            diagonals.set('diagonal',
+    //            ((diagonals.get('diagonal') === undefined)? 0 : diagonals.get('diagonal')) + value)
+    //        }
+    //        if(rowIndex + 1 + columnIndex == range){
+    //            diagonals.set('antidiagonal',
+    //            ((diagonals.get('antidiagonal') === undefined)? 0 : diagonals.get('antidiagonal')) + value)
+    //        }
+    //    })
+    //})
+    let cost = 0;
+    const usedNumbers = []
+    const oddNumbers = [1,3,7,9]
+    const evenNumbers = [2,4,6,8]
+
+    let dif = getDif(matrix[0,1], oddNumbers, []);
+    matrix[0,1] -= dif
+    oddNumbers.splice(oddNumbers.indexOf(matrix[0,1]), 1)
+    usedNumbers.push(matrix[0,1])
+    cost += Math.abs(dif)
+
+    let difOpposite01 = matrix[3,1] - (magicConstant - matrix[0,1])
+    matrix[3,1] -= difOpposite01
+    oddNumbers.splice(oddNumbers.indexOf(matrix[3,1]), 1)
+    cost += Math.abs(difOpposite01);
+
+    let difOpposite10 = getDif(matrix[1,0], oddNumbers, usedNumbers);
+    matrix[1,0] += difOpposite10
+    oddNumbers.splice(oddNumbers.indexOf(matrix[1,0]), 1)
+    cost += Math.abs(difOpposite10);
+    
+    let difOpposite12 = matrix[1,2] - (magicConstant - matrix[1,0])
+    matrix[1,2] -= difOpposite12
+    oddNumbers.splice(oddNumbers.indexOf(matrix[1,2]), 1)
+    cost += Math.abs(difOpposite12);
+
+
+    let difOpposite00 = getDif(matrix[0,0], evenNumbers, usedNumbers);
+    matrix[0,0] += difOpposite00
+    evenNumbers.splice(evenNumbers.indexOf(matrix[0,0]), 1)
+    cost += Math.abs(difOpposite00);
+    
+    let value02 = magicConstant - matrix[0,0] - matrix[0,1]
+    let value20 = magicConstant - matrix[0,0] - matrix[1,0]
+    let value22 = matrix[2,2] - evenNumbers[0]
+
+    let dif02 = matrix[0,2] - value02;
+    let dif20 = matrix[2,0] - value20;
+    let dif22 = matrix[2,2] - value22;
 }
-
-formMagicSquare([[2,2,3],[4,5,6],[7,8,9]])
-
-
-
